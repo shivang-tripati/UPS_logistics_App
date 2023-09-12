@@ -1,0 +1,36 @@
+type Order {
+  carrier: String
+  createdAt: Date
+  shippingCost: Int
+  trackingId: String
+  Address: String
+  City: String
+  Lat: Float
+  Lng: Float
+  trackingItems: TrackingItems
+  @materializer( 
+    query: "getTrackingItemById"
+    arguments: [{name: "id", field: "trackingId"}]
+  )
+  # @materializer directive is used to customize how data is fetched and mapped from an external source to your GraphQL schema,
+  #   allowing you to define custom resolver functions for specific fields
+
+}
+
+type orderList {
+  name: ID
+  value: Order
+}
+
+type Query {
+  getOrderById(id: ID): Order
+  @rest(
+      endpoint: "https://ups-delivery-fb53b-default-rtdb.asia-southeast1.firebasedatabase.app/orders/$id.json"
+    )
+
+  getOrders: [orderList]
+    @rest(
+      endpoint: "https://ups-delivery-fb53b-default-rtdb.asia-southeast1.firebasedatabase.app/orders.json"
+      transforms: [{pathpattern: [], editor: "objectToArray"}]
+    )
+}
